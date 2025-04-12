@@ -149,7 +149,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: fe779c6ffd25af04697c71a886691abb, type: 3}
   m_Resource: {fileID: 8300000, guid: fe779c6ffd25af04697c71a886691abb, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -613,11 +613,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ce08d2526aaae1479f0a76edea22f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfPoles: 20
-  width: 0.4
-  height: 1
-  depth: 0.1
-  triangleHeight: 0.3
+  arrowZeroPoint: {x: 0, y: 0, z: 0}
+  height: 0.5
+  width: 0.1
+  arrowHeadHeight: 0.1
+  arrowHeadWidth: 0.1
 --- !u!1 &1168512264
 GameObject:
   m_ObjectHideFlags: 0
