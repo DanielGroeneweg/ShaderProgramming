@@ -1,17 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Handout {
-	public class CreateArrows : MonoBehaviour {
-        public Vector3 arrowZeroPoint;
-		public float height=1;
-		public float width=0.1f;
-		public float arrowHeadHeight = 0.1f;
-        public float arrowHeadWidth = 0.1f;
-
+	public class CreateMesh : MonoBehaviour {
+        [SerializeField] private float brickSize = 1;
+        [SerializeField] private int pyramidLayers = 4;
 		MeshBuilder builder;
-
 		void Start () {
 			builder = new MeshBuilder ();
 			CreateShape ();
@@ -26,178 +22,120 @@ namespace Handout {
                 GetComponent<MeshFilter>().mesh = builder.CreateMesh(true);
             }
         }
-
 		void CreateShape()
 		{
 			builder.Clear();
 
-			// Create fence
-			for (int i = 0; i < 3; i++)
+			// Create Pyramid
+			for (int i = 1; i <= pyramidLayers; i++)
 			{
-				Vector3 offset = new Vector3(0,0,0);
+                float length = brickSize * i - 1;
+                float bricksInRow = i;
 
-                float degreesToRotate = -360 / 1 * i;
+                for (int o = 0; o < bricksInRow; o++)
+                {
+                    for (int p = 0; p < bricksInRow; p++)
+                    {
+                        Vector3 offset = new Vector3(-length / 2f, brickSize * pyramidLayers, -length / 2f);
 
-                // position vectors:
-                Vector3 v1 = new Vector3(offset.x + width / 2f, offset.y, offset.z + -width / 2f);
-                Vector3 v2 = new Vector3(offset.x + -width / 2f, offset.y, offset.z + -width / 2f);
+                        offset.x += brickSize * o;
+                        offset.y -= brickSize * i;
+                        offset.z += brickSize * p;
 
-                Vector3 v3 = new Vector3(offset.x + width / 2f, offset.y + height, offset.z + -width / 2f);
-                Vector3 v4 = new Vector3(offset.x + -width / 2f, offset.y + height, offset.z + -width / 2f);
-
-                Vector3 v5 = new Vector3(offset.x + width / 2f, offset.y, offset.z + width / 2f);
-                Vector3 v6 = new Vector3(offset.x + -width / 2f, offset.y, offset.z + width / 2f);
-                
-                Vector3 v7 = new Vector3(offset.x + width / 2f, offset.y + height, offset.z + width / 2f);
-                Vector3 v8 = new Vector3(offset.x + -width / 2f, offset.y + height, offset.z + width / 2f);
-
-                // Arrow head
-                Vector3 v9 = new Vector3(offset.x, offset.y + height + arrowHeadHeight, offset.z);
-
-                Vector3 v10 = new Vector3(offset.x + width / 2f + arrowHeadWidth / 2f, offset.y + height, offset.z + -width / 2f + - arrowHeadWidth / 2f);
-                Vector3 v11 = new Vector3(offset.x + -width / 2f + -arrowHeadWidth / 2f, offset.y + height, offset.z + -width / 2f + - arrowHeadWidth / 2f);
-
-                Vector3 v12 = new Vector3(offset.x + width / 2f + arrowHeadWidth / 2f, offset.y + height, offset.z + width / 2f + arrowHeadWidth / 2f);
-                Vector3 v13 = new Vector3(offset.x + -width / 2f + -arrowHeadWidth / 2f, offset.y + height, offset.z + width / 2f + arrowHeadWidth / 2f);
-                //----------------//
-
-                // front:
-                // bottom:
-                int v1_1 = builder.AddVertex(v1, new Vector2(1, 1));
-                int v1_2 = builder.AddVertex(v1, new Vector2(0, 1));
-                int v1_3 = builder.AddVertex(v1, new Vector2(1, 0));
-
-                int v2_1 = builder.AddVertex(v2, new Vector2(0, 1));
-                int v2_2 = builder.AddVertex(v2, new Vector2(0, 1));
-                int v2_3 = builder.AddVertex(v2, new Vector2(1, 1));
-                int v2_4 = builder.AddVertex(v2, new Vector2(0, 0));
-                int v2_5 = builder.AddVertex(v2, new Vector2(0, 0));
-
-                // top:
-                int v3_1 = builder.AddVertex(v3, new Vector2(1, 0));
-                int v3_2 = builder.AddVertex(v3, new Vector2(1, 0));
-                int v3_3 = builder.AddVertex(v3, new Vector2(0, 0));
-                int v3_4 = builder.AddVertex(v3, new Vector2(0, 0));
-                int v3_5 = builder.AddVertex(v3, new Vector2(0.75f, 0.25f));
-                int v3_6 = builder.AddVertex(v3, new Vector2(0.75f, 0.25f));
-                int v3_7 = builder.AddVertex(v3, new Vector2(0.75f, 0.25f));
-
-                int v4_1 = builder.AddVertex(v4, new Vector2(0, 0));
-                int v4_2 = builder.AddVertex(v4, new Vector2(1, 0));
-                int v4_3 = builder.AddVertex(v4, new Vector2(1, 0));
-                int v4_4 = builder.AddVertex(v4, new Vector2(0.25f, 0.25f));
-                int v4_5 = builder.AddVertex(v4, new Vector2(0.25f, 0.25f));
-                int v4_6 = builder.AddVertex(v4, new Vector2(0.25f, 0.25f));
-				//----------------//
-
-                // back:
-				// bottom:
-                int v5_1 = builder.AddVertex(v5, new Vector2(0, 1));
-                int v5_2 = builder.AddVertex(v5, new Vector2(1, 1));
-                int v5_3 = builder.AddVertex(v5, new Vector2(1, 1));
-                int v5_4 = builder.AddVertex(v5, new Vector2(1, 1));
-                int v5_5 = builder.AddVertex(v5, new Vector2(1, 1));
-
-                int v6_1 = builder.AddVertex(v6, new Vector2(1, 1));
-                int v6_2 = builder.AddVertex(v6, new Vector2(1, 1));
-                int v6_3 = builder.AddVertex(v6, new Vector2(0, 1));
-                int v6_4 = builder.AddVertex(v6, new Vector2(0, 1));
-                int v6_5 = builder.AddVertex(v6, new Vector2(0, 0.5f));
-
-                // top:
-                int v7_1 = builder.AddVertex(v7, new Vector2(0, 0));
-                int v7_2 = builder.AddVertex(v7, new Vector2(0, 0));
-                int v7_3 = builder.AddVertex(v7, new Vector2(1, 0));
-                int v7_4 = builder.AddVertex(v7, new Vector2(0.75f, 0.75f));
-                int v7_5 = builder.AddVertex(v7, new Vector2(0.75f, 0.75f));
-                int v7_6 = builder.AddVertex(v7, new Vector2(0.75f, 0.75f));
-
-                int v8_1 = builder.AddVertex(v8, new Vector2(1, 0));
-                int v8_2 = builder.AddVertex(v8, new Vector2(0, 0));
-                int v8_3 = builder.AddVertex(v8, new Vector2(0.25f, 0.75f));
-                int v8_4 = builder.AddVertex(v8, new Vector2(0.25f, 0.75f));
-                int v8_5 = builder.AddVertex(v8, new Vector2(0.25f, 0.75f));
-                //----------------//
-
-                // ArrowHead:
-                int v9_1 = builder.AddVertex(v9, new Vector2(0.5f, 0));
-				int v9_2 = builder.AddVertex(v9, new Vector2(0.5f, 0));
-				int v9_3 = builder.AddVertex(v9, new Vector2(0.5f, 0));
-				int v9_4 = builder.AddVertex(v9, new Vector2(0.5f, 0));
-
-				int v10_1 = builder.AddVertex(v10, new Vector2(1, 0.5f));
-				int v10_2 = builder.AddVertex(v10, new Vector2(1, 0.5f));
-				int v10_3 = builder.AddVertex(v10, new Vector2(1, 0));
-				int v10_4 = builder.AddVertex(v10, new Vector2(1, 0));
-				int v10_5 = builder.AddVertex(v10, new Vector2(1, 0));
-
-                int v11_1 = builder.AddVertex(v11, new Vector2(0, 0.5f));
-                int v11_2 = builder.AddVertex(v11, new Vector2(0, 0.5f));
-                int v11_3 = builder.AddVertex(v11, new Vector2(0, 0));
-                int v11_4 = builder.AddVertex(v11, new Vector2(0, 0));
-                int v11_5 = builder.AddVertex(v11, new Vector2(0, 0));
-
-                int v12_1 = builder.AddVertex(v12, new Vector2(0, 0.5f));
-                int v12_2 = builder.AddVertex(v12, new Vector2(0, 0.5f));
-                int v12_3 = builder.AddVertex(v12, new Vector2(1, 1));
-                int v12_4 = builder.AddVertex(v12, new Vector2(1, 1));
-                int v12_5 = builder.AddVertex(v12, new Vector2(1, 1));
-
-                int v13_1 = builder.AddVertex(v13, new Vector2(1, 0.5f));
-                int v13_2 = builder.AddVertex(v13, new Vector2(1, 0.5f));
-                int v13_3 = builder.AddVertex(v13, new Vector2(0, 1));
-                int v13_4 = builder.AddVertex(v13, new Vector2(0, 1));
-                int v13_5 = builder.AddVertex(v13, new Vector2(0, 1));
-                //----------------//
-
-                // Bottom
-                builder.AddTriangle(v5_4, v2_4, v1_3);
-                builder.AddTriangle(v2_5, v5_5, v6_5);
-
-                // front
-                builder.AddTriangle(v1_1, v2_1, v3_1);
-				builder.AddTriangle(v2_2, v4_1, v3_2);
-				
-
-				// back
-				builder.AddTriangle(v7_1, v6_1, v5_1);
-				builder.AddTriangle(v7_2, v8_1, v6_2);
-				
-
-				// sides
-				builder.AddTriangle(v1_2, v3_3, v5_2);
-				builder.AddTriangle(v3_4, v7_3, v5_3);
-				builder.AddTriangle(v6_3, v4_2, v2_3);
-				builder.AddTriangle(v6_4, v8_2, v4_3);
-
-                // ArrowHead
-                builder.AddTriangle(v9_1, v10_1, v11_1);
-                builder.AddTriangle(v9_2, v11_2, v13_1);
-                builder.AddTriangle(v13_2, v12_1, v9_3);
-                builder.AddTriangle(v9_4, v12_2, v10_2);
-
-                builder.AddTriangle(v11_3, v10_3, v3_5);
-                builder.AddTriangle(v3_6, v4_4, v11_4);
-
-                builder.AddTriangle(v13_3, v11_5, v4_5);
-                builder.AddTriangle(v13_4, v4_6, v8_3);
-
-                builder.AddTriangle(v12_3, v13_5, v8_4);
-                builder.AddTriangle(v12_4, v8_5, v7_4);
-
-                builder.AddTriangle(v10_4, v12_5, v7_5);
-                builder.AddTriangle(v10_5, v7_6, v3_7);
+                        CreateBrick(offset);
+                    }
+                }                
             }
 		}
-        private Vector3 RotateAroundPoint(Vector3 vectorToRotate, Vector3 point, float angle)
-        {
-            angle *= Mathf.Deg2Rad;
+		void CreateBrick(Vector3 offset)
+		{
+            // position vectors:
+            // Front
+            Vector3 vec1 = new Vector3(offset.x + brickSize / 2f, offset.y, offset.z - brickSize / 2f);
+            Vector3 vec2 = new Vector3(offset.x - brickSize / 2f, offset.y, offset.z - brickSize / 2f);
+            Vector3 vec3 = new Vector3(offset.x + brickSize / 2f, offset.y + brickSize, offset.z - brickSize / 2f);
+            Vector3 vec4 = new Vector3(offset.x - brickSize / 2f, offset.y + brickSize, offset.z - brickSize / 2f);
 
-            Vector2 v = new Vector2(vectorToRotate.x - point.x, vectorToRotate.z - point.z);
+            // Back
+            Vector3 vec5 = new Vector3(offset.x + brickSize / 2f, offset.y, offset.z + brickSize / 2f);
+            Vector3 vec6 = new Vector3(offset.x - brickSize / 2f, offset.y, offset.z + brickSize / 2f);
+            Vector3 vec7 = new Vector3(offset.x + brickSize / 2f, offset.y + brickSize, offset.z + brickSize / 2f);
+            Vector3 vec8 = new Vector3(offset.x - brickSize / 2f, offset.y + brickSize, offset.z + brickSize / 2f);
+            //----------------//
 
-            v = new Vector2(v.x * Mathf.Cos(angle) - v.y * Mathf.Sin(angle), v.x * Mathf.Sin(angle) + v.y * Mathf.Cos(angle));
+            // Front
+            int v1_1 = builder.AddVertex(vec1, new Vector2(1, 1));
+            int v1_2 = builder.AddVertex(vec1, new Vector2(0, 1));
+            int v1_3 = builder.AddVertex(vec1, new Vector2(0, 1));
+            int v1_4 = builder.AddVertex(vec1, new Vector2(1, 1));
 
-            return new Vector3(v.x + point.x, vectorToRotate.y, v.y + point.z);
+            int v2_1 = builder.AddVertex(vec2, new Vector2(0, 1));
+            int v2_2 = builder.AddVertex(vec2, new Vector2(0, 1));
+            int v2_3 = builder.AddVertex(vec2, new Vector2(1, 1));
+            int v2_4 = builder.AddVertex(vec2, new Vector2(0, 1));
+            int v2_5 = builder.AddVertex(vec2, new Vector2(0, 1));
+
+            int v3_1 = builder.AddVertex(vec3, new Vector2(1, 0));
+            int v3_2 = builder.AddVertex(vec3, new Vector2(1, 0));
+            int v3_3 = builder.AddVertex(vec3, new Vector2(0, 0));
+            int v3_4 = builder.AddVertex(vec3, new Vector2(0, 0));
+            int v3_5 = builder.AddVertex(vec3, new Vector2(1, 1));
+
+            int v4_1 = builder.AddVertex(vec4, new Vector2(0, 0));
+            int v4_2 = builder.AddVertex(vec4, new Vector2(0, 0));
+            int v4_3 = builder.AddVertex(vec4, new Vector2(1, 0));
+            int v4_4 = builder.AddVertex(vec4, new Vector2(1, 0));
+            int v4_5 = builder.AddVertex(vec4, new Vector2(0, 1));
+            int v4_6 = builder.AddVertex(vec4, new Vector2(0, 1));
+
+
+            // Back
+            int v5_1 = builder.AddVertex(vec5, new Vector2(1, 1));
+            int v5_2 = builder.AddVertex(vec5, new Vector2(1, 1));
+            int v5_3 = builder.AddVertex(vec5, new Vector2(0, 1));
+            int v5_4 = builder.AddVertex(vec5, new Vector2(1, 0));
+            int v5_5 = builder.AddVertex(vec5, new Vector2(1, 0));
+
+            int v6_1 = builder.AddVertex(vec6, new Vector2(0, 1));
+            int v6_2 = builder.AddVertex(vec6, new Vector2(0, 1));
+            int v6_3 = builder.AddVertex(vec6, new Vector2(1, 1));
+            int v6_4 = builder.AddVertex(vec6, new Vector2(1, 1));
+            int v6_5 = builder.AddVertex(vec6, new Vector2(0, 0));
+
+            int v7_1 = builder.AddVertex(vec7, new Vector2(1, 0));
+            int v7_2 = builder.AddVertex(vec7, new Vector2(0, 0));
+            int v7_3 = builder.AddVertex(vec7, new Vector2(0, 0));
+            int v7_4 = builder.AddVertex(vec7, new Vector2(1, 0));
+            int v7_5 = builder.AddVertex(vec7, new Vector2(1, 0));
+
+            int v8_1 = builder.AddVertex(vec8, new Vector2(0, 0));
+            int v8_2 = builder.AddVertex(vec8, new Vector2(1, 0));
+            int v8_3 = builder.AddVertex(vec8, new Vector2(0, 0));
+            //----------------//
+
+            // Front
+            builder.AddTriangle(v1_1, v2_1, v3_1);
+            builder.AddTriangle(v3_2, v2_2, v4_2);
+
+            // Left
+            builder.AddTriangle(v6_1, v4_3, v2_3);
+            builder.AddTriangle(v4_4, v6_2, v8_1);
+
+            // Right
+            builder.AddTriangle(v1_2, v3_3, v5_1);
+            builder.AddTriangle(v7_1, v5_2, v3_4);
+
+            // Back
+            builder.AddTriangle(v7_2, v6_3, v5_3);
+            builder.AddTriangle(v8_2, v6_4, v7_3);
+
+            // Top
+            builder.AddTriangle(v3_5, v4_5, v7_4);
+            builder.AddTriangle(v8_3, v7_5, v4_6);
+
+            // Bottom
+            builder.AddTriangle(v5_4, v2_4, v1_4);
+            builder.AddTriangle(v2_5, v5_5, v6_5);
         }
 	}
 }
