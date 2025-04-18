@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-
+﻿using UnityEngine;
 namespace Handout {
 	public class CreateMesh : MonoBehaviour {
         [SerializeField] private float brickSize = 1;
@@ -36,6 +32,7 @@ namespace Handout {
                 {
                     for (int p = 0; p < bricksInRow; p++)
                     {
+                        if (o > 0 && o < bricksInRow - 1 && p > 0 && p < bricksInRow - 1) continue;
                         Vector3 offset = new Vector3(-length / 2f, brickSize * pyramidLayers, -length / 2f);
 
                         offset.x += brickSize * o;
