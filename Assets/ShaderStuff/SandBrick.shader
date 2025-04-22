@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
 Shader "Unlit/SandBrick"
 {
     Properties
@@ -66,7 +64,6 @@ Shader "Unlit/SandBrick"
 
                 float fogValue = length(i.posInCamera) * _FogStrength;
                 float4 fog = _FogColor * fogValue;
-
 
                 albedo *= (_Ambient + light);
 

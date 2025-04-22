@@ -34,10 +34,12 @@ Properties
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
-                float4 posInCamera : POSITIONT;
+                float4 posInCamera : POSITIONT0;
             };
 
             sampler2D _MainTex;
+            float4 _MainTex_ST;
+            float4 _MainTex_TexelSize;
             sampler2D _HeightMap;
             float4 _Ambient;
             float _Tint;
@@ -49,13 +51,15 @@ Properties
                 v2f o;
 
                 float4 color = tex2Dlod(_HeightMap, float4(v.uv, 0, 0));
-                float4 modVertex = (v.vertex + float4(0, -10 + length(color) * 10, 0, 0));
+                float4 modVertex = (v.vertex + float4(0, length(color) * 2 - 1.25 * 2, 0, 0));
                 o.vertex = UnityObjectToClipPos(modVertex);
 
-                o.uv = v.uv;
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
                 float4x4 mvp = UNITY_MATRIX_MV;
                 o.posInCamera = mul(mvp, v.normal);
+
+                color = tex2Dlod(_HeightMap, float4(v.uv.x-1, v.uv.y, 0, 0));
 
                 return o;
             }
