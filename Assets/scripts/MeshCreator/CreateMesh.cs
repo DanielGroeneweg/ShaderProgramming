@@ -3,11 +3,13 @@ namespace Handout {
 	public class CreateMesh : MonoBehaviour {
         [SerializeField] private float brickSize = 1;
         [SerializeField] private int pyramidLayers = 4;
-		MeshBuilder builder;
+		
+        // Internal
+        private MeshBuilder builder;
 		void Start () {
-			builder = new MeshBuilder ();
-			CreateShape ();
-			GetComponent<MeshFilter> ().mesh = builder.CreateMesh (true);
+            builder = new MeshBuilder();
+			CreateShape();
+			GetComponent<MeshFilter>().mesh = builder.CreateMesh(true);
 		}
         void Update()
         {
