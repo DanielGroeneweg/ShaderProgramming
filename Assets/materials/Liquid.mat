@@ -114,8 +114,8 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MeshMaxY: 5.03562
-    - _MeshMinY: 0.59902453
+    - _MeshMaxY: 2.917146
+    - _MeshMinY: 2.717499
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
