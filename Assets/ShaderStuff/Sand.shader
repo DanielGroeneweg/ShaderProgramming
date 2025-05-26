@@ -8,6 +8,8 @@ Properties
         _Tint("Tint", Color) = (1,1,1,1)
         _FogColor("Fog Color", Color) = (1,1,1,1)
         _FogStrength("Fog Strength", float) = 1
+        _StepSize("Step Size", float) = 0.01
+        _UseStepSize("Use Step Size", Range(0,1)) = 0
     }
     SubShader
     {
@@ -34,8 +36,6 @@ Properties
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float4 posInCamera : POSITIONT0;
-                float4 nextUDir : POSITIONT1;
-                float4 nextVDir : POSITIONT2;
                 float4 normal : NORMAL;
             };
 
@@ -44,6 +44,8 @@ Properties
             float4 _MainTex_ST;
             sampler2D _HeightMap;
             float4 _HeightMap_TexelSize;
+            float _StepSize;
+            float _UseStepSize;
 
             // Fog
             float4 _Ambient;
@@ -59,33 +61,11 @@ Properties
                 float4 modVertex = v.vertex;
                 modVertex.y += length(color) * 2 - 1.25 * 2;
                 o.vertex = UnityObjectToClipPos(modVertex);
-                //o.vertex = UnityObjectToClipPos(v.vertex);
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
                 float4x4 mvp = UNITY_MATRIX_MV;
                 o.posInCamera = mul(mvp, o.vertex);
-
-
-                // Terrain Lighting
-
-                // U coordinate
-                float4 nextUColor = tex2Dlod(_HeightMap, float4(v.uv.x + _HeightMap_TexelSize.x, v.uv.y, 0, 0));
-                float4 nextUVert = (v.vertex.xyzw);
-                nextUVert.x += _HeightMap_TexelSize.x;
-                nextUVert.y += length(nextUColor) * 2 - 1.25 * 2;
-
-                float4 uDirVec = nextUVert - modVertex;
-                o.nextUDir = uDirVec;
-
-                // V coordinate
-                float4 nextVColor = tex2Dlod(_HeightMap, float4(v.uv.x, v.uv.y + _HeightMap_TexelSize.y, 0, 0));
-                float4 nextVVert = (v.vertex.xyzw);
-                nextVVert.z += _HeightMap_TexelSize.y;
-                nextVVert.y += length(nextVColor) * 2 - 1.25 * 2;
-
-                float4 vDirVec = nextVVert - modVertex;
-                o.nextVDir = vDirVec;
 
                 o.normal = v.normal;
 
@@ -94,6 +74,7 @@ Properties
 
             fixed4 frag(v2f i) : SV_Target
             {
+                /*
                 float4 albedo = tex2D(_MainTex, i.uv);
                 albedo += _Tint;
 
@@ -108,34 +89,30 @@ Properties
                 albedo += fog;
                 
                 return saturate(albedo);
-
-                /*
-                float4 _Color = float4(0,0,0,1);
-
-                // X Axis
-                if (i.nextUDir.y > 0)
-                {
-                    _Color.y = i.nextUDir.y * 10;
-                }
-
-                else if (i.nextUDir.y < 0)
-                {
-                    _Color.x = abs(i.nextUDir.y) * 10;
-                }
-
-                // Y Axis
-                if (i.nextVDir.y > 0)
-                {
-                    _Color.y = i.nextVDir.y * 50;
-                }
-
-                else if (i.nextVDir.y < 0)
-                {
-                    _Color.x = abs(i.nextVDir.y) * 50;
-                }
-
-                return _Color;
                 */
+
+                // Horizontal
+                float stepSize = _HeightMap_TexelSize.x;
+                if (_UseStepSize == 1) stepSize = _StepSize;
+
+                float4 _LeftColor = tex2D(_HeightMap, float2(i.uv.x - stepSize, i.uv.y));
+                float4 _RightColor = tex2D(_HeightMap, float2(i.uv.x + stepSize, i.uv.y));
+
+                float4 _HorizontalColor = (_LeftColor - _RightColor) * 25;
+
+                // Vertical
+                stepSize = _HeightMap_TexelSize.y;
+                if (_UseStepSize == 1) stepSize = _StepSize;
+
+                float4 _TopColor = tex2D(_HeightMap, float2(i.uv.x, i.uv.y + stepSize));
+                float4 _BottomColor = tex2D(_HeightMap, float2(i.uv.x, i.uv.y - stepSize));
+
+                float4 _VerticalColor = (_TopColor - _BottomColor) * 25;
+
+                // Total color
+                float4 _Color = _HorizontalColor + _VerticalColor;
+
+                return float4(_Color.xy, 0, 1);
             }
             ENDCG
         }
