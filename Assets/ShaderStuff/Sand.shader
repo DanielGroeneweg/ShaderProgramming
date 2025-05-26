@@ -11,9 +11,8 @@ Properties
     }
     SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags { "RenderType"="Opaque" }
         LOD 100
-
         Pass
         {
             CGPROGRAM
@@ -37,6 +36,7 @@ Properties
                 float4 posInCamera : POSITIONT0;
                 float4 nextUDir : POSITIONT1;
                 float4 nextVDir : POSITIONT2;
+                float4 normal : NORMAL;
             };
 
             // HeightMap
@@ -64,7 +64,10 @@ Properties
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
                 float4x4 mvp = UNITY_MATRIX_MV;
-                o.posInCamera = mul(mvp, v.normal);
+                o.posInCamera = mul(mvp, o.vertex);
+
+
+                // Terrain Lighting
 
                 // U coordinate
                 float4 nextUColor = tex2Dlod(_HeightMap, float4(v.uv.x + _HeightMap_TexelSize.x, v.uv.y, 0, 0));
@@ -84,6 +87,8 @@ Properties
                 float4 vDirVec = nextVVert - modVertex;
                 o.nextVDir = vDirVec;
 
+                o.normal = v.normal;
+
                 return o;
             }
 
@@ -92,7 +97,10 @@ Properties
                 float4 albedo = tex2D(_MainTex, i.uv);
                 albedo += _Tint;
 
-                float fogValue = length(i.posInCamera) * _FogStrength;
+                float value = saturate(dot(i.normal, _WorldSpaceLightPos0));
+                float4 light = _LightColor0 * value;
+
+                float fogValue = clamp(length(i.posInCamera) * _FogStrength, 0, 100);
                 float4 fog = _FogColor * fogValue;
 
                 albedo += _Ambient;
