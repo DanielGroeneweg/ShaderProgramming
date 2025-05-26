@@ -1,16 +1,18 @@
-Shader "Unlit/SandBrick"
+Shader "Unlit/Transparent"
 {
     Properties
     {
-        _MainTex("Texture", 2D) = "white" {}
-        _Ambient("Ambient Color", Color) = (1,1,1,1)
-        _Tint("Tint", Color) = (1,1,1,1)
+        _MainTex ("Texture", 2D) = "white" {}
+        _BaseColor ("Base Color", Color) = (1,1,1,1)
         _FogColor("Fog Color", Color) = (1,1,1,1)
         _FogStrength("Fog Strength", float) = 1
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
+        ZWrite Off
+        Blend SrcAlpha OneMinusSrcAlpha
+        Cull front 
         LOD 100
 
         Pass
@@ -18,6 +20,8 @@ Shader "Unlit/SandBrick"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            // make fog work
+            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
             #include "UnityLightingCommon.cginc"
@@ -25,19 +29,22 @@ Shader "Unlit/SandBrick"
             struct appdata
             {
                 float4 vertex : POSITION;
-                float4 normal : NORMAL;
                 float2 uv : TEXCOORD0;
+                float4 normal : NORMAL;
             };
 
             struct v2f
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float4 posInCamera : POSITIONT0;
                 float4 normal : NORMAL;
-                float4 posInCamera : POSITIONT;
             };
 
             sampler2D _MainTex;
+            float4 _MainTex_ST;
+            float4 _BaseColor;
+
             float4 _Ambient;
             float _Tint;
             float _FogStrength;
@@ -47,8 +54,8 @@ Shader "Unlit/SandBrick"
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                o.normal = normalize(mul(UNITY_MATRIX_M, float4(v.normal.xyz, 0)));
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+
                 float4x4 mvp = UNITY_MATRIX_MV;
                 o.posInCamera = mul(mvp, v.normal);
                 return o;
@@ -56,20 +63,18 @@ Shader "Unlit/SandBrick"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float4 albedo = tex2D(_MainTex, i.uv);
-                albedo += _Tint;
+                float4 _Color = _BaseColor;
 
-                float value = saturate(dot(i.normal, _WorldSpaceLightPos0));
-                float4 light = _LightColor0 * value;
+                _Color.xyz += _Tint;
 
                 float fogValue = length(i.posInCamera) * _FogStrength;
                 float4 fog = _FogColor * fogValue;
 
-                albedo *= (_Ambient + light);
+                _Color.xyz += _Ambient.xyz;
 
-                albedo += fog;
-                
-                return saturate(albedo);
+                _Color.xyz += fog.xyz;
+
+                return _Color;
             }
             ENDCG
         }

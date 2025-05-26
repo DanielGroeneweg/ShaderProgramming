@@ -110,12 +110,13 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FillLevel: 0.638
+    - _FillLevel: 0.89
+    - _FogStrength: 0.05
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MeshMaxY: 2.917146
-    - _MeshMinY: 2.717499
+    - _MeshMaxY: 2.8778746
+    - _MeshMinY: 2.7567704
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -130,9 +131,11 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - _Ambient: {r: 0.2627451, g: 0.11764706, b: 0.11764706, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FogColor: {r: 0.5019608, g: 0, b: 0.043137256, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
     - _Tint: {r: 0.2627451, g: 0.11681204, b: 0.11681204, a: 0.7294118}
   m_BuildTextureStacks: []

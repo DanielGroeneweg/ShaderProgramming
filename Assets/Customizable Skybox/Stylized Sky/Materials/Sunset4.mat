@@ -31,7 +31,7 @@ Material:
     - _HorizonLineBlendMode: 1
     - _HorizonLineContribution: 0.21
     - _HorizonLineExponent: 15
-    - _SkyGradientExponent: 0.25
+    - _SkyGradientExponent: 0
     - _SunDiscContribution: 1
     - _SunDiscExponent: 5000
     - _SunDiscExponentSize: 12000

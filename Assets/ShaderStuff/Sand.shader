@@ -36,7 +36,7 @@ Properties
                 float4 vertex : SV_POSITION;
                 float4 posInCamera : POSITIONT0;
                 float4 nextUDir : POSITIONT1;
-                float4 nextVDir : POSITIONT2    ;
+                float4 nextVDir : POSITIONT2;
             };
 
             // HeightMap
@@ -66,9 +66,6 @@ Properties
                 float4x4 mvp = UNITY_MATRIX_MV;
                 o.posInCamera = mul(mvp, v.normal);
 
-                //Test
-
-                modVertex = (v.vertex + float4(0, length(color) * 2 - 1.25 * 2, 0, 0));
                 // U coordinate
                 float4 nextUColor = tex2Dlod(_HeightMap, float4(v.uv.x + _HeightMap_TexelSize.x, v.uv.y, 0, 0));
                 float4 nextUVert = (v.vertex.xyzw);
@@ -92,7 +89,6 @@ Properties
 
             fixed4 frag(v2f i) : SV_Target
             {
-                /*
                 float4 albedo = tex2D(_MainTex, i.uv);
                 albedo += _Tint;
 
@@ -103,9 +99,9 @@ Properties
 
                 albedo += fog;
                 
-                return albedo;
-                */
+                return saturate(albedo);
 
+                /*
                 float4 _Color = float4(0,0,0,1);
 
                 // X Axis
@@ -119,7 +115,6 @@ Properties
                     _Color.x = abs(i.nextUDir.y) * 10;
                 }
 
-                /*
                 // Y Axis
                 if (i.nextVDir.y > 0)
                 {
@@ -130,9 +125,9 @@ Properties
                 {
                     _Color.x = abs(i.nextVDir.y) * 50;
                 }
-                */
 
                 return _Color;
+                */
             }
             ENDCG
         }

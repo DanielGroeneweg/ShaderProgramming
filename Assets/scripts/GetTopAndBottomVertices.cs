@@ -1,19 +1,10 @@
 using UnityEngine;
-using UnityEngine.UIElements;
-
 public class GetTopAndBottomVertices : MonoBehaviour
 {
     [SerializeField] private Material material;
-    private void Start()
-    {
-        SetVertices();
-    }
     private void Update()
     {
-        if (Input.GetMouseButtonDown((int)MouseButton.LeftMouse))
-        {
-            SetVertices();
-        }
+        SetVertices();
     }
     private void SetVertices()
     {
