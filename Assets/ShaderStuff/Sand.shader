@@ -59,7 +59,7 @@ Properties
 
                 float4 color = tex2Dlod(_HeightMap, float4(v.uv, 0, 0));
                 float4 modVertex = v.vertex;
-                modVertex.y += length(color) * 2 - 1.25 * 2;
+                modVertex.y += length(color) * 2 - 2.5;
                 o.vertex = UnityObjectToClipPos(modVertex);
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -92,13 +92,17 @@ Properties
                 */
 
                 // Horizontal
+                
+
+                // calculating normals
+                // Horizontal
                 float stepSize = _HeightMap_TexelSize.x;
                 if (_UseStepSize == 1) stepSize = _StepSize;
 
                 float4 _LeftColor = tex2D(_HeightMap, float2(i.uv.x - stepSize, i.uv.y));
                 float4 _RightColor = tex2D(_HeightMap, float2(i.uv.x + stepSize, i.uv.y));
 
-                float4 _HorizontalColor = (_LeftColor - _RightColor) * 25;
+                float4 _HorizontalColor = (_RightColor - _LeftColor) * 25;
 
                 // Vertical
                 stepSize = _HeightMap_TexelSize.y;
@@ -107,12 +111,14 @@ Properties
                 float4 _TopColor = tex2D(_HeightMap, float2(i.uv.x, i.uv.y + stepSize));
                 float4 _BottomColor = tex2D(_HeightMap, float2(i.uv.x, i.uv.y - stepSize));
 
-                float4 _VerticalColor = (_TopColor - _BottomColor) * 25;
+                float4 _VerticalColor = (_BottomColor - _TopColor) * 25;
 
                 // Total color
-                float4 _Color = _HorizontalColor + _VerticalColor;
+                //float3 _Cross = cross(float3(_HorizontalColor.xyz), float3(_VerticalColor.xyz));
 
-                return float4(_Color.xy, 0, 1);
+                float4 _Color = float4(0.15, _VerticalColor.y, 0, 1) + float4(0.15, _HorizontalColor.y, 0, 1);
+
+                return _Color;
             }
             ENDCG
         }
