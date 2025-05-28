@@ -62,7 +62,7 @@ Shader "Unlit/SandBrick"
                 float value = saturate(dot(i.normal, _WorldSpaceLightPos0));
                 float4 light = _LightColor0 * value;
 
-                float fogValue = length(i.posInCamera) * _FogStrength;
+                float fogValue = saturate(exp(_FogStrength * i.posInCamera.z));
                 float4 fog = _FogColor * fogValue;
 
                 albedo *= (_Ambient + light);

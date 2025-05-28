@@ -70,7 +70,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _Diff: 0
     - _DstBlend: 0
-    - _FogStrength: 0.001
+    - _FogStrength: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -83,7 +83,7 @@ Material:
     - _SrcBlend: 1
     - _StepSize: 0.005
     - _UVSec: 0
-    - _UseStepSize: 1
+    - _UseStepSize: 0
     - _UseStepZie: 0
     - _ZWrite: 1
     m_Colors:
