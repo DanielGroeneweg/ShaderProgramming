@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
 Shader "Unlit/Sand"
 {
 Properties
@@ -12,6 +10,7 @@ Properties
         _FogStrength("Fog Strength", float) = 1
         _StepSize("Step Size", float) = 0.01
         _UseStepSize("Use Step Size", Range(0,1)) = 0
+        _ShadowStrength("Shadow Brightness", Range(0,1)) = 0.1
     }
     SubShader
     {
@@ -29,7 +28,7 @@ Properties
             struct appdata
             {
                 float4 vertex : POSITION;
-                float3 normal : NORMAL;
+                float4 normal : NORMAL;
                 float2 uv : TEXCOORD0;
             };
 
@@ -38,7 +37,7 @@ Properties
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float4 posInCamera : POSITIONT0;
-                float3 normal : NORMAL;
+                float4 normal : NORMAL;
             };
 
             // HeightMap
@@ -55,11 +54,14 @@ Properties
             float _FogStrength;
             float4 _FogColor;
 
+            // Lighting
+            float _ShadowStrength;
+
             v2f vert(appdata v)
             {
                 v2f o;
 
-                float heightScale = 2.0;
+                float heightScale = 3.0;
                 float heightBase = 0.5 * heightScale;
 
                 float4 color = tex2Dlod(_HeightMap, float4(v.uv, 0, 0));
@@ -72,9 +74,7 @@ Properties
                 float4 worldPos = mul(unity_ObjectToWorld, modVertex);
                 o.posInCamera = mul(UNITY_MATRIX_V, worldPos);
 
-
                 // calculate normals
-
                 float2 uv = v.uv;
                 float stepX = (_UseStepSize == 1) ? _StepSize : _HeightMap_TexelSize.x;
                 float stepY = (_UseStepSize == 1) ? _StepSize : _HeightMap_TexelSize.y;
@@ -85,42 +85,34 @@ Properties
                 float hT = tex2Dlod(_HeightMap, float4(uv + float2(0, stepY), 0, 0)).r * heightScale - heightBase;
                 float hB = tex2Dlod(_HeightMap, float4(uv - float2(0, stepY), 0, 0)).r * heightScale - heightBase;
 
-                // Construct positions purely in UV-based space
-                float3 pL = float3(uv.x - stepX, hL, uv.y);
-                float3 pR = float3(uv.x + stepX, hR, uv.y);
-                float3 pT = float3(uv.x, hT, uv.y + stepY);
-                float3 pB = float3(uv.x, hB, uv.y - stepY);
+                // Vertices
+                float3 vL = float3(-stepX, hL, 0);
+                float3 vR = float3(stepX, hR, 0);
+                float3 vT = float3(0, hT, stepY);
+                float3 vB = float3(0, hB, -stepY);
 
                 // Cross for normal
-                float3 horizontal = pL - pR;
-                float3 vertical = pB - pT;
-                float3 normal = normalize(cross(horizontal, vertical));
+                float3 horizontal = vL - vR;
+                float3 vertical = vT - vB;
+                float3 normal = cross(horizontal, vertical);
 
-                // If needed, transform to world space
-                o.normal = mul((float3x3)unity_ObjectToWorld, normal);
+                // Transform to world space
+                o.normal = mul(UNITY_MATRIX_M, float4(normalize(normal), 0));
 
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 albedo = tex2D(_MainTex, i.uv);
-                albedo += _Tint;
-
-                float value = saturate(dot(normalize(i.normal), _WorldSpaceLightPos0.xyz));
-                float4 light = _LightColor0 * value;
-                albedo *= light;
-
-                float fogValue = saturate(_FogStrength * length(i.posInCamera));
-                float4 fog = _FogColor * fogValue;
-
-                albedo += _Ambient;
-
-                albedo += fog;
+                float4 col = tex2D(_MainTex, i.uv);
+                col += _Tint;
+                col *= _LightColor0;
                 
-                return saturate(albedo);
+                float diffuse = saturate(dot(i.normal, _WorldSpaceLightPos0));
+                col = lerp (_Ambient + col * _ShadowStrength, col, diffuse);
 
-                //return float4(i.normal * 0.5 + 0.5, 1);
+                return col;
+                //return float4(i.normal.xyz, 1);
             }
             ENDCG
         }
