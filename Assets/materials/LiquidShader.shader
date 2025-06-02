@@ -73,10 +73,10 @@ Shader "Unlit/LiquidShader"
                 float alpha = _FillLevel - normalizedY;
                 if (alpha <= 0) _Color.a = 0;
 
-                float fogValue = saturate(exp(-_FogStrength * i.posInCamera.z));
+                float fogValue = saturate(_FogStrength * length(i.posInCamera));
                 float4 fog = _FogColor * fogValue;
 
-                _Color.xyz += _Ambient;
+                _Color.xyz *= _Ambient;
 
                 _Color.xyz += fog;
 

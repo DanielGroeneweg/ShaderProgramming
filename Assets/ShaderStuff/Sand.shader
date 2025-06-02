@@ -11,6 +11,7 @@ Properties
         _StepSize("Step Size", float) = 0.01
         _UseStepSize("Use Step Size", Range(0,1)) = 0
         _ShadowStrength("Shadow Brightness", Range(0,1)) = 0.1
+        _ShowNormals("Show Normals", Range(0,1)) = 0
     }
     SubShader
     {
@@ -56,6 +57,7 @@ Properties
 
             // Lighting
             float _ShadowStrength;
+            float _ShowNormals;
 
             v2f vert(appdata v)
             {
@@ -92,9 +94,10 @@ Properties
                 float3 vB = float3(0, hB, -stepY);
 
                 // Cross for normal
-                float3 horizontal = vL - vR;
+                float3 horizontal = vR - vL;
                 float3 vertical = vT - vB;
                 float3 normal = cross(horizontal, vertical);
+                normal.y*=-1;
 
                 // Transform to world space
                 o.normal = mul(UNITY_MATRIX_M, float4(normalize(normal), 0));
@@ -104,6 +107,8 @@ Properties
 
             fixed4 frag(v2f i) : SV_Target
             {
+                if (_ShowNormals == 1) return float4(i.normal.xyz, 1);
+
                 float4 col = tex2D(_MainTex, i.uv);
                 col += _Tint;
                 col *= _LightColor0;
@@ -111,8 +116,12 @@ Properties
                 float diffuse = saturate(dot(i.normal, _WorldSpaceLightPos0));
                 col = lerp (_Ambient + col * _ShadowStrength, col, diffuse);
 
+                float fogValue = saturate(_FogStrength * length(i.posInCamera));
+                float4 fog = _FogColor * fogValue;
+
+                col += fog;
+
                 return col;
-                //return float4(i.normal.xyz, 1);
             }
             ENDCG
         }

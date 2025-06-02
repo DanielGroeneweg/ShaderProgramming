@@ -67,7 +67,7 @@ Shader "Unlit/Transparent"
 
                 _Color.xyz += _Tint;
 
-                float fogValue = saturate(exp(-_FogStrength * i.posInCamera.z));
+                float fogValue = saturate(_FogStrength * length(i.posInCamera));
                 float4 fog = _FogColor * fogValue;
 
                 _Color.xyz += _Ambient.xyz;

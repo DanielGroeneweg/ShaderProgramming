@@ -65,8 +65,7 @@ namespace Handout {
             // Front
             int v1_1 = builder.AddVertex(vec1, new Vector2(1, 1));
             int v1_2 = builder.AddVertex(vec1, new Vector2(0, 1));
-            int v1_3 = builder.AddVertex(vec1, new Vector2(0, 1));
-            int v1_4 = builder.AddVertex(vec1, new Vector2(1, 1));
+            int v1_3 = builder.AddVertex(vec1, new Vector2(1, 1));
 
             int v2_1 = builder.AddVertex(vec2, new Vector2(0, 1));
             int v2_2 = builder.AddVertex(vec2, new Vector2(0, 1));
@@ -81,11 +80,10 @@ namespace Handout {
             int v3_5 = builder.AddVertex(vec3, new Vector2(1, 1));
 
             int v4_1 = builder.AddVertex(vec4, new Vector2(0, 0));
-            int v4_2 = builder.AddVertex(vec4, new Vector2(0, 0));
+            int v4_2 = builder.AddVertex(vec4, new Vector2(1, 0));
             int v4_3 = builder.AddVertex(vec4, new Vector2(1, 0));
-            int v4_4 = builder.AddVertex(vec4, new Vector2(1, 0));
+            int v4_4 = builder.AddVertex(vec4, new Vector2(0, 1));
             int v4_5 = builder.AddVertex(vec4, new Vector2(0, 1));
-            int v4_6 = builder.AddVertex(vec4, new Vector2(0, 1));
 
 
             // Back
@@ -114,11 +112,11 @@ namespace Handout {
 
             // Front
             builder.AddTriangle(v1_1, v2_1, v3_1);
-            builder.AddTriangle(v3_2, v2_2, v4_2);
+            builder.AddTriangle(v3_2, v2_2, v4_1);
 
             // Left
-            builder.AddTriangle(v6_1, v4_3, v2_3);
-            builder.AddTriangle(v4_4, v6_2, v8_1);
+            builder.AddTriangle(v6_1, v4_2, v2_3);
+            builder.AddTriangle(v4_3, v6_2, v8_1);
 
             // Right
             builder.AddTriangle(v1_2, v3_3, v5_1);
@@ -129,11 +127,11 @@ namespace Handout {
             builder.AddTriangle(v8_2, v6_4, v7_3);
 
             // Top
-            builder.AddTriangle(v3_5, v4_5, v7_4);
-            builder.AddTriangle(v8_3, v7_5, v4_6);
+            builder.AddTriangle(v3_5, v4_4, v7_4);
+            builder.AddTriangle(v8_3, v7_5, v4_5);
 
             // Bottom
-            builder.AddTriangle(v5_4, v2_4, v1_4);
+            builder.AddTriangle(v5_4, v2_4, v1_3);
             builder.AddTriangle(v2_5, v5_5, v6_5);
         }
 	}
