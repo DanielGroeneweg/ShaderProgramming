@@ -10,6 +10,7 @@ Properties
         _FogStrength("Fog Strength", float) = 1
         _StepSize("Step Size", float) = 0.01
         _UseStepSize("Use Step Size", Range(0,1)) = 0
+        _ShadowStrength("Shadow Brightness", Range(0,1)) = 0.1
     }
     SubShader
     {
@@ -49,76 +50,69 @@ Properties
 
             // Fog
             float4 _Ambient;
-            float _Tint;
+            float4 _Tint;
             float _FogStrength;
             float4 _FogColor;
+
+            // Lighting
+            float _ShadowStrength;
 
             v2f vert(appdata v)
             {
                 v2f o;
 
+                float heightScale = 3.0;
+                float heightBase = 0.5 * heightScale;
+
                 float4 color = tex2Dlod(_HeightMap, float4(v.uv, 0, 0));
                 float4 modVertex = v.vertex;
-                modVertex.y += length(color) * 2 - 2.5;
+                modVertex.y = color.r * heightScale - heightBase;
                 o.vertex = UnityObjectToClipPos(modVertex);
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
-                float4x4 mvp = UNITY_MATRIX_MV;
-                o.posInCamera = mul(mvp, o.vertex);
+                float4 worldPos = mul(unity_ObjectToWorld, modVertex);
+                o.posInCamera = mul(UNITY_MATRIX_V, worldPos);
 
-                o.normal = v.normal;
+                // calculate normals
+                float2 uv = v.uv;
+                float stepX = (_UseStepSize == 1) ? _StepSize : _HeightMap_TexelSize.x;
+                float stepY = (_UseStepSize == 1) ? _StepSize : _HeightMap_TexelSize.y;
+
+                // Heights
+                float hL = tex2Dlod(_HeightMap, float4(uv - float2(stepX, 0), 0, 0)).r * heightScale - heightBase;
+                float hR = tex2Dlod(_HeightMap, float4(uv + float2(stepX, 0), 0, 0)).r * heightScale - heightBase;
+                float hT = tex2Dlod(_HeightMap, float4(uv + float2(0, stepY), 0, 0)).r * heightScale - heightBase;
+                float hB = tex2Dlod(_HeightMap, float4(uv - float2(0, stepY), 0, 0)).r * heightScale - heightBase;
+
+                // Vertices
+                float3 vL = float3(-stepX, hL, 0);
+                float3 vR = float3(stepX, hR, 0);
+                float3 vT = float3(0, hT, stepY);
+                float3 vB = float3(0, hB, -stepY);
+
+                // Cross for normal
+                float3 horizontal = vL - vR;
+                float3 vertical = vT - vB;
+                float3 normal = cross(horizontal, vertical);
+
+                // Transform to world space
+                o.normal = mul(UNITY_MATRIX_M, float4(normalize(normal), 0));
 
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
-                /*
-                float4 albedo = tex2D(_MainTex, i.uv);
-                albedo += _Tint;
-
-                float value = saturate(dot(i.normal, _WorldSpaceLightPos0));
-                float4 light = _LightColor0 * value;
-
-                float fogValue = clamp(length(i.posInCamera) * _FogStrength, 0, 100);
-                float4 fog = _FogColor * fogValue;
-
-                albedo += _Ambient;
-
-                albedo += fog;
+                float4 col = tex2D(_MainTex, i.uv);
+                col += _Tint;
+                col *= _LightColor0;
                 
-                return saturate(albedo);
-                */
+                float diffuse = saturate(dot(i.normal, _WorldSpaceLightPos0));
+                col = lerp (_Ambient + col * _ShadowStrength, col, diffuse);
 
-                // Horizontal
-                
-
-                // calculating normals
-                // Horizontal
-                float stepSize = _HeightMap_TexelSize.x;
-                if (_UseStepSize == 1) stepSize = _StepSize;
-
-                float4 _LeftColor = tex2D(_HeightMap, float2(i.uv.x - stepSize, i.uv.y));
-                float4 _RightColor = tex2D(_HeightMap, float2(i.uv.x + stepSize, i.uv.y));
-
-                float4 _HorizontalColor = (_RightColor - _LeftColor) * 25;
-
-                // Vertical
-                stepSize = _HeightMap_TexelSize.y;
-                if (_UseStepSize == 1) stepSize = _StepSize;
-
-                float4 _TopColor = tex2D(_HeightMap, float2(i.uv.x, i.uv.y + stepSize));
-                float4 _BottomColor = tex2D(_HeightMap, float2(i.uv.x, i.uv.y - stepSize));
-
-                float4 _VerticalColor = (_BottomColor - _TopColor) * 25;
-
-                // Total color
-                //float3 _Cross = cross(float3(_HorizontalColor.xyz), float3(_VerticalColor.xyz));
-
-                float4 _Color = float4(0.15, _VerticalColor.y, 0, 1) + float4(0.15, _HorizontalColor.y, 0, 1);
-
-                return _Color;
+                return col;
+                //return float4(i.normal.xyz, 1);
             }
             ENDCG
         }
