@@ -73,8 +73,7 @@ Properties
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
-                float4 worldPos = mul(unity_ObjectToWorld, modVertex);
-                o.posInCamera = mul(UNITY_MATRIX_V, worldPos);
+                o.posInCamera = mul(UNITY_MATRIX_V, float4(modVertex.xyz, 1));
 
                 // calculate normals
                 float2 uv = v.uv;
@@ -116,10 +115,14 @@ Properties
                 float diffuse = saturate(dot(i.normal, _WorldSpaceLightPos0));
                 col = lerp (_Ambient + col * _ShadowStrength, col, diffuse);
 
-                float fogValue = saturate(_FogStrength * length(i.posInCamera));
+                float fogValue = _FogStrength * length(i.posInCamera);
                 float4 fog = _FogColor * fogValue;
 
                 col += fog;
+
+                col.r = min(col.r, _FogColor.r);
+                col.g = min(col.g, _FogColor.g);
+                col.b = min(col.b, _FogColor.b);
 
                 return col;
             }

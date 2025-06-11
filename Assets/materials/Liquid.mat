@@ -111,12 +111,12 @@ Material:
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _FillLevel: 0.48
-    - _FogStrength: 0.05
+    - _FogStrength: 0
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MeshMaxY: 0.54997414
-    - _MeshMinY: 0.45322588
+    - _MeshMaxY: 0.54863745
+    - _MeshMinY: 0.45456257
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005

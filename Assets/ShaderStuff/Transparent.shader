@@ -57,7 +57,7 @@ Shader "Unlit/Transparent"
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
                 float4x4 mvp = UNITY_MATRIX_MV;
-                o.posInCamera = mul(mvp, v.normal);
+                o.posInCamera = mul(mvp, float4(v.vertex.xyz, 0));
                 return o;
             }
 

@@ -57,11 +57,11 @@ Shader "Unlit/LiquidShader"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
-                o.normal = normalize(mul(UNITY_MATRIX_M, float4(v.normal.xyz, 0)));
+                o.normal = normalize(mul(UNITY_MATRIX_M, float4(v.vertex.xyz, 0)));
                 o.pos = mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1));
 
                 float4x4 mvp = UNITY_MATRIX_MV;
-                o.posInCamera = mul(mvp, v.normal);
+                o.posInCamera = mul(mvp, float4(v.vertex.xyz, 0));
                 return o;
             }
 

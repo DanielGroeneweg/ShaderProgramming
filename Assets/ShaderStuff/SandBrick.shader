@@ -50,7 +50,7 @@ Shader "Unlit/SandBrick"
                 o.uv = v.uv;
                 o.normal = normalize(mul(UNITY_MATRIX_M, float4(v.normal.xyz, 0)));
                 float4x4 mvp = UNITY_MATRIX_MV;
-                o.posInCamera = mul(mvp, v.normal);
+                o.posInCamera = mul(mvp, float4(v.vertex.xyz, 1));
                 return o;
             }
 
@@ -62,12 +62,16 @@ Shader "Unlit/SandBrick"
                 float value = saturate(dot(i.normal, _WorldSpaceLightPos0));
                 float4 light = _LightColor0 * value;
 
-                float fogValue = saturate(_FogStrength * length(i.posInCamera));
+                float fogValue = _FogStrength * length(i.posInCamera);
                 float4 fog = _FogColor * fogValue;
 
                 albedo *= (_Ambient + light);
 
                 albedo += fog;
+
+                albedo.r = min(albedo.r, _FogColor.r);
+                albedo.g = min(albedo.g, _FogColor.g);
+                albedo.b = min(albedo.b, _FogColor.b);
                 
                 return saturate(albedo);
             }
