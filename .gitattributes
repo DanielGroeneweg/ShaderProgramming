@@ -1,3 +1,4 @@
 *.wav filter=lfs diff=lfs merge=lfs -text
 Assets/Materials/BLbrickwall_normal.png filter=lfs diff=lfs merge=lfs -text
 Assets/materials/BLbrickwall_albedo.png filter=lfs diff=lfs merge=lfs -text
+DanielGroeneweg_532508_ShaderProgramming.zip filter=lfs diff=lfs merge=lfs -text
